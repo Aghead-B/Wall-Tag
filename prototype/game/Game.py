@@ -1,11 +1,27 @@
+# code om punten te tellen
+# Punten Module
+# Spelers Module
+# @Author Damian
 # code om de levens te berekennen en weer te geven
 # @Aghead_Bilal
+# je begint met 3 levens standard
+
+#
 target = True
 targetIsHit = False
-# je begint met 3 levens standard
 Levens = 3
 
-# import the time module
+
+# Punten
+start_punten = 0
+punten = 0
+eind_punten = start_punten + punten
+
+
+speler = input("Voer hier uw nickname in: ")
+print(speler + " Get Ready !" )
+
+
 import time
 
 # define the countdown func.
@@ -18,11 +34,10 @@ def countdown(t):
         t -= 1
 
 # na het voltooien van de loop, printen we "Fire in the hole" om te weer te geven dat het eind van de countdown is
-    print('Fire not in the hole!!')
-
+    print('Missed Shot')
 
 # input time in seconds
-t = input("Enter the time in seconds: ")
+t = input("Enter the time in seconds to start the game: ")
 
 # loop om de levens te bewerken als de target niet geraakt is
 while target == True and Levens != 0:
@@ -30,28 +45,13 @@ while target == True and Levens != 0:
         countdown(int(t))
         print(f"Levens:{Levens - 1}")
         Levens -= 1
+    else: targetIsHit = True
+    punten + 1
+# Punten toevoegen waneer sensor afgaat
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+print("Totaal Punten:")
+print(eind_punten)
 
 
 
