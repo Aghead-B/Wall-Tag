@@ -15,14 +15,14 @@ while ser:
         line = ser.readline();
         decoded = line.decode('utf-8')
         currentState = (decoded.strip() == '1')
-        if lastState != currentState and currentState:
+        if lastState != currentState and (currentState == True or currentState == False):
             if currentState == True:
                 print("geraakt!")
                 # Hier is het target geraakt
             else:
                 # Hier is het target niet meer geraakt
                 print(":(")
-            lastState = currentState
+        lastState = currentState
     except:
         print("Something went wrong")
         # De ontvanger is niet meer te bereiken! Graag nog goede afhandeling dmv foutmelding weergeven ofzo
