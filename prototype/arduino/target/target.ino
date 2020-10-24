@@ -1,11 +1,13 @@
 const int irPin = 6;
 const int statusPin = 5;
+const int minimumPulsesRequired = 2;
 
 int falseTime = 0;
 int trueTime = 0;
 int debounceTime = 50;
-bool isTrue = true;
-int buttonState = 1;
+bool notHit = true;
+int sensorState = 1;
+int pulses = 0;
 
 void setup() {
     // put your setup code here, to run once:
@@ -20,24 +22,34 @@ void setup() {
 
 void loop() {
     // put your main code here, to run repeatedly:
-    buttonState = digitalRead(irPin);
-    if (buttonState == HIGH) {
+    sensorState = digitalRead(irPin);
+    if (sensorState == HIGH) {
         // NO incoming signal (sensor outputs high)
-        if (!isTrue) {
+        if (!notHit) {
             trueTime++;
+            delay(5);
             if (trueTime > debounceTime) {
-                isTrue = true;
-                digitalWrite(statusPin, HIGH);
+                notHit = true;
+                //Serial.println(!sensorState);
             }
         } else {
             falseTime = 0;  
         }
     } else {
         // Incoming signal (low pulses)
-        isTrue = false;
-        digitalWrite(statusPin, LOW);
-        trueTime = 0;
+        if (notHit == false || pulses >= minimumPulsesRequired && notHit == true) {
+            notHit = false;
+            trueTime = 0;
+            pulses = 0;
+        }
+        pulses++;
     }
+    if (notHit) {
+        digitalWrite(statusPin, HIGH);
+    } else {
+        digitalWrite(statusPin, LOW);
+    }
+    
+    Serial.println(!notHit);
     delay(10);
-    Serial.println(!isTrue);
 }

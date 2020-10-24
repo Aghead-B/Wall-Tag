@@ -47,6 +47,7 @@ void setup() {
 uint16_t sAddress = 0xa90;
 uint8_t sCommand = 0x34;
 uint8_t sRepeats = 0;
+uint8_t iteration = 0;
 
 void loop() {
     printDistance();
@@ -54,6 +55,7 @@ void loop() {
     if (buttonState == HIGH) {
         digitalWrite(laserPin, HIGH);
         shootIR();
+        delay(50);
     } else {
         delay(50);
         digitalWrite(laserPin, LOW);
@@ -62,6 +64,8 @@ void loop() {
 
 void shootIR() {
     IrSender.sendNECStandard(sAddress, sCommand, sRepeats);
+    sAddress++;
+    sCommand++;
 }
 
 void printDistance() {
