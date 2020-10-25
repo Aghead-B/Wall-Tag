@@ -10,6 +10,7 @@ import serial
 import sys
 import time
 import threading
+import random
 
 
 class Game(object):
@@ -56,13 +57,13 @@ class Game(object):
     gunDistance = 0
     targetStatus = False
 
-    def __init__(self, debug = False):
+    def __init__(self, testMode = False):
         """
         De class begint altijd met het controleren van de verbindingen, zijn die er niet dan stopt de applicatie.
         """
-        self.DEBUG = debug
+        self.testMode = testMode
 
-        if not self.DEBUG:
+        if not self.testMode:
             try:
                 self.serTarget = serial.Serial('/dev/serial/by-id/usb-1a86_USB2.0-Serial-if00-port0', 9600, timeout=1)
             except:
@@ -74,6 +75,10 @@ class Game(object):
             except:
                 print("De gun is niet aangesloten!")
                 sys.exit()
+        else:
+            self.serTarget = TestObject('target')
+            self.serGun = TestObject('gun')
+
         if self.DEBUG: print("DEBUG: Game ready")
 
     def readLine(self, serialObject):
@@ -202,3 +207,24 @@ class Game(object):
 
             if self.playerLives <= 0:
                 self.quit()
+
+class TestObject(object):
+    def __init__(self, type):
+        self.type = type
+        self.i = 0
+        self.targetline = '0'
+
+    def readline(self):
+        time.sleep(.5)
+        line = '0'
+        if self.type == 'gun':
+            line = str(random.randrange(100, 250)) # afstand van gun
+        elif self.type == 'target':
+            if self.i % 10 == 0:
+                if self.targetline == '0':
+                    self.targetline = '1'
+                else:
+                    self.targetline = '0'
+            line = self.targetline
+        self.i += 1
+        return line.encode()
