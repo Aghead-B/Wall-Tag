@@ -56,21 +56,24 @@ class Game(object):
     gunDistance = 0
     targetStatus = False
 
-    def __init__(self):
+    def __init__(self, debug = False):
         """
         De class begint altijd met het controleren van de verbindingen, zijn die er niet dan stopt de applicatie.
         """
-        try:
-            self.serTarget = serial.Serial('/dev/serial/by-id/usb-1a86_USB2.0-Serial-if00-port0', 9600, timeout=1)
-        except:
-            print("De targets zijn niet aangesloten!")
-            sys.exit()
+        self.DEBUG = debug
 
-        try:
-            self.serGun = serial.Serial('/dev/serial/by-id/usb-Arduino_LLC_Arduino_Leonardo-if00', 9600, timeout=1)
-        except:
-            print("De gun is niet aangesloten!")
-            sys.exit()
+        if not self.DEBUG:
+            try:
+                self.serTarget = serial.Serial('/dev/serial/by-id/usb-1a86_USB2.0-Serial-if00-port0', 9600, timeout=1)
+            except:
+                print("De targets zijn niet aangesloten!")
+                sys.exit()
+
+            try:
+                self.serGun = serial.Serial('/dev/serial/by-id/usb-Arduino_LLC_Arduino_Leonardo-if00', 9600, timeout=1)
+            except:
+                print("De gun is niet aangesloten!")
+                sys.exit()
         if self.DEBUG: print("DEBUG: Game ready")
 
     def readLine(self, serialObject):
@@ -199,7 +202,3 @@ class Game(object):
 
             if self.playerLives <= 0:
                 self.quit()
-
-
-game = Game()
-game.start()
