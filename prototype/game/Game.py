@@ -56,6 +56,7 @@ class Game(object):
     elapsedTime = 0
     gunDistance = 0
     targetStatus = False
+    lastLine = ''
 
     def __init__(self, testMode = False):
         """
@@ -67,19 +68,19 @@ class Game(object):
             try:
                 self.serTarget = serial.Serial('/dev/serial/by-id/usb-1a86_USB2.0-Serial-if00-port0', 9600, timeout=1)
             except:
-                print("De targets zijn niet aangesloten!")
+                self.lastLine = "De targets zijn niet aangesloten!"
                 sys.exit()
 
             try:
                 self.serGun = serial.Serial('/dev/serial/by-id/usb-Arduino_LLC_Arduino_Leonardo-if00', 9600, timeout=1)
             except:
-                print("De gun is niet aangesloten!")
+                self.lastLine = "De gun is niet aangesloten!"
                 sys.exit()
         else:
             self.serTarget = TestObject('target')
             self.serGun = TestObject('gun')
 
-        if self.DEBUG: print("DEBUG: Game ready")
+        if self.DEBUG: self.lastLine = "DEBUG: Game ready"
 
     def readLine(self, serialObject):
         while True:
@@ -95,7 +96,7 @@ class Game(object):
             except UnicodeDecodeError:  # Decoding foutjes negeren
                 continue
             except serial.SerialException:
-                print('Verbinding met gun of targets verloren!')
+                self.lastLine = 'Verbinding met gun of targets verloren!'
                 self.isRunning = False
                 self.quit()
 
@@ -143,12 +144,11 @@ class Game(object):
     # Hierin worden ook de threads gestart, waaronder de game loop
     def start(self):
         # Om naam vragen en instructies geven aan begin van het hele spel
-        self.playerName = input("Voer hier uw naam in: ")
         time.sleep(1)
-        print(self.playerName + " get ready!")
+        self.lastLine = self.playerName + " get ready!"
         time.sleep(2)
-        print("Je hebt " + str(self.playerLives) + " levens en " + str(
-            self.TARGET_HIT_TIMEOUT) + " seconden om een doelwit te raken.")
+        self.lastLine = "Je hebt " + str(self.playerLives) + " levens en " + str(
+            self.TARGET_HIT_TIMEOUT) + " seconden om een doelwit te raken."
         time.sleep(3)
 
         self.startTime = time.time()
@@ -160,7 +160,7 @@ class Game(object):
 
     def countdown(self, seconds):
         for s in range(seconds):
-            print(str(seconds - s) + "...")
+            self.lastLine = str(seconds - s) + "..."
             time.sleep(1)
 
 
@@ -172,17 +172,13 @@ class Game(object):
             time.sleep(1 / self.updateRate)
 
             if self.DEBUG:
-                print("DEBUG: " +
-                      str(int(self.elapsedTime)) + "s : " +
-                      str(self.gunDistance) + "cm, target hit = " + str(self.targetStatus)
-                      )
+                self.lastLine = "DEBUG: " + str(int(self.elapsedTime)) + "s : " + str(self.gunDistance) + "cm, target hit = " + str(self.targetStatus)
 
             # En hier moet alle game code
 
             if not waitingForHit:  # Game start hier
-                print()
                 self.countdown(self.COUNTDOWN_TIME)
-                print("Schiet!")
+                self.lastLine = "Schiet!"
                 startTime = self.currentTime
                 waitingForHit = True
             else:
@@ -192,16 +188,16 @@ class Game(object):
                     # Doelwit geraakt
                     self.playerPoints += 1
                     waitingForHit = False
-                    print("Goedzo! Je hebt nu " + str(self.playerPoints) + " punt(en)!")
+                    self.lastLine = "Goedzo! Je hebt nu " + str(self.playerPoints) + " punt(en)!"
                     time.sleep(2)
 
                 elif (self.currentTime - startTime) >= self.TARGET_HIT_TIMEOUT:
                     # Timeout (te lang gewacht met schieten)
                     self.playerLives -= 1
                     if self.playerLives == 0:
-                        print("Je hebt geen levens meer! Game over!")
+                        self.lastLine = "Je hebt geen levens meer! Game over!"
                     else:
-                        print("Te laat met schieten! Je hebt nu maar " + str(self.playerLives) + " leven(s).")
+                        self.lastLine = "Te laat met schieten! Je hebt nu maar " + str(self.playerLives) + " leven(s)."
                     waitingForHit = False
                     time.sleep(2)
 
