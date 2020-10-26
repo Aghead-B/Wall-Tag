@@ -1,17 +1,25 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect
 from Game import Game
 app = Flask(__name__)
-
+game = Game(True)
 
 @app.route('/')
 def index():
-    game = Game(True)
-    return render_template('index.html', variabele=game.playerLives, levens=game.GUN_DISTANCE_SAMPLES)
-
-@app.route('/test')
-def test():
-    print("test")
     return render_template('index.html')
+
+
+@app.route('/signup', methods = ['POST'])
+def signup():
+    player_name = request.form['player_name']
+    game.playerName = player_name
+    game.start()
+    return render_template('game.html')
+
+@app.route('/update')
+def update():
+    return render_template('update.html', game=game)
+
+
 
 
 
