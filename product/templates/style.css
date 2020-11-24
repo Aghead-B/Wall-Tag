@@ -1,0 +1,81 @@
+body {
+    background-color: #570f05;
+    margin: 0;
+}
+
+#inleiding {
+    text-align: center;
+    color: goldenrod;
+}
+
+#photo {
+    width: 100px;
+    position: fixed;
+    top: 0;
+    right: 0;
+}
+
+#button {
+    background-color: #691406;
+    color: white;
+}
+
+#names {
+    word-spacing: 30px;
+    font-size: 20px;
+    color: #ea7b45;
+}
+
+#user {
+    font-size: 20px;
+    color: white;
+}
+
+#player_name {
+    width: 150px;
+    font-size: 15px;
+    background-color: #691406;
+    color: white;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #570f05;
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
+li {
+  float: left;
+}
+
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+li a:hover:not(.active) {
+  background-color: #ea7b45;
+}
+
+.active {
+      background-color: goldenrod;
+}
+#gegevens {
+    text-align: left;
+    word-spacing: 15px;
+    font-size: 15px;
+    color: #ea7b45;
+}
+h2 {
+    text-align: center;
+    font-size: 45px;
+    color: #ea7b45;
+}
