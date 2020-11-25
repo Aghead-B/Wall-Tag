@@ -1,6 +1,13 @@
 body {
     background-color: #570f05;
     margin: 0;
+    font-family: sans-serif;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+    width: 100%;
 }
 
 #inleiding {
@@ -44,8 +51,6 @@ ul {
   padding: 0;
   overflow: hidden;
   background-color: #570f05;
-  position: fixed;
-  top: 0;
   width: 100%;
 }
 
