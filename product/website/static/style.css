@@ -25,9 +25,12 @@ body {
 #button {
     background-color: #691406;
     color: white;
+    size: 100px;
+
 }
 
 #names {
+    margin-top: 200px;
     word-spacing: 30px;
     font-size: 20px;
     color: #ea7b45;
@@ -39,19 +42,23 @@ body {
 }
 
 #player_name {
-    width: 150px;
+    align-content: center;
+    width: 250px;
     font-size: 15px;
     background-color: #691406;
     color: white;
 }
 
 ul {
+    align-content: center;
   list-style-type: none;
-  margin: 0;
-  padding: 0;
+  margin-right: 55%;
+  margin-left: 35%;
+  padding: 15px;
   overflow: hidden;
   background-color: #570f05;
   width: 100%;
+  text-align: center;
 }
 
 li {
@@ -83,4 +90,14 @@ h2 {
     text-align: center;
     font-size: 45px;
     color: #ea7b45;
+}
+#startgame {
+    align-content: center;
+    padding: 100px;
+    text-align: center;
+}
+div buttonStart {
+    margin-top: 50%;
+    margin-bottom: 10%;
+    size: 100px;
 }

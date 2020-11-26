@@ -13,16 +13,22 @@
                 <li><img id="photo" src="/static/logo.png" /></li>
             </ul>
             <div id="inleiding">
-                <h1>Walltag project</h1>
-                <h1 id="names">UnderGod<br>Damian  Evelien  Hamza  Aghead</h1>
+                <h1>The Walltag Project</h1>
+                <h3 id="SpelInfo">Wall-Tag draait om naukeurigheid en snelheid, de speler bezit 3 levens & een Gun. <br>
+                                    De bedoeling is dat de speler de targets raakt binnen 2.0 seconden.
+                        Succes :)
+                </h3>
             </div>
-            <form action="/signup"  method="post">
-                <p class="formulier">
+            <div id="startgame">
+                <form class="formulier" action="/signup"  method="post">
                     <label for="player_name" id="user">First name:</label>
                     <input type="text" id="player_name" name="player_name">
+                <div id="buttonStart">
                     <button id="button" type="submit" value="Submit">Start Game</button>
-                </p>
-            </form>
+                </div>
+                </form>
+                <h1 id="names">Team-UnderGod<br>Damian  Evelien  Hamza  Aghead</h1>
+            </div>
         </div>
     </body>
 </html>
