@@ -14,7 +14,7 @@ import threading
 import random
 import mysql.connector
 
-database= mysql.connector.connect(
+database = mysql.connector.connect(
     host="oege.ie.hva.nl",
     user="biteld",
     password="ZcPnyn7ZhG$z0V",
@@ -211,7 +211,7 @@ class Game(object):
                     time.sleep(2)
 
             if self.playerLives == 0:
-                print("done")
+                print("done") # om te kijken of het werkt
                 cursor = database.cursor()
                 sql = "INSERT INTO Game " \
                       "(`nickname`, `score`, `lives`, `date`) " \
