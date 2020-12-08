@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" serverName="hetzner" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="pi@192.168.137.222:22" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
-      <paths name="hetzner">
+      <paths name="pi@192.168.137.222:22">
         <serverdata>
           <mappings>
-            <mapping deploy="var/www/emailmeplease.net" local="$PROJECT_DIR$/../emailmeplease" web="/" />
+            <mapping deploy="/home/pi/wallatg" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
     </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
   </component>
 </project>

@@ -9,15 +9,16 @@
 import serial
 import sys
 import time
+import timeit
 import threading
 import random
 import mysql.connector
 
 database= mysql.connector.connect(
     host="oege.ie.hva.nl",
-    user="bilalma",
-    password="UQkVu13VhJlX+g",
-    database="zbilalma",
+    user="biteld",
+    password="ZcPnyn7ZhG$z0V",
+    database="zbiteld",
 )
 
 
@@ -209,10 +210,13 @@ class Game(object):
                     waitingForHit = False
                     time.sleep(2)
 
-            if self.playerLives == 0 or self.playerPoints >= 30:
+            if self.playerLives == 0:
+                print("done")
                 cursor = database.cursor()
-                sql = "INSERT INTO Game (`nickname`, `score`, `lives`, `date`, `time_played`) VALUES (game.playerName, game.playerPoints, game.playerLives, NOW());"
-                cursor.execute(sql)
+                sql = "INSERT INTO Game " \
+                      "(`nickname`, `score`, `lives`, `date`) " \
+                      "VALUES (%s, %s, %s, NOW());"
+                cursor.execute(sql, (self.playerName, self.playerPoints, self.playerLives))
                 database.commit()
                 self.quit()
 
