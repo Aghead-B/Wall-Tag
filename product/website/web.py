@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, redirect
 from Game import Game
+
+
 app = Flask(__name__, static_url_path='/static')
 game = Game(True)
 

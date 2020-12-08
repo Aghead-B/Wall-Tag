@@ -11,6 +11,14 @@ import sys
 import time
 import threading
 import random
+import mysql.connector
+
+database= mysql.connector.connect(
+    host="oege.ie.hva.nl",
+    user="bilalma",
+    password="UQkVu13VhJlX+g",
+    database="zbilalma",
+)
 
 
 class Game(object):
@@ -201,7 +209,11 @@ class Game(object):
                     waitingForHit = False
                     time.sleep(2)
 
-            if self.playerLives <= 0:
+            if self.playerLives == 0 or self.playerPoints >= 30:
+                cursor = database.cursor()
+                sql = "INSERT INTO Game (`nickname`, `score`, `lives`, `date`, `time_played`) VALUES (game.playerName, game.playerPoints, game.playerLives, NOW());"
+                cursor.execute(sql)
+                database.commit()
                 self.quit()
 
 class TestObject(object):
