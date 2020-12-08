@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <link rel="stylesheet" href="/static/style.css" type="text/css" />
+        <link rel="stylesheet" href="/static/style.css" type="text/css" media="screen" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <title>Walltag</title>
     </head>
     <body>
@@ -14,11 +15,21 @@
             </ul>
             <h2>Walltag</h2>
             <div id="gegevens">
-                <p>Player_Name: {{ game.playerName }} </p>
-                <p>Lives: {{ game.playerLives }}</p>
-                <p>score: {{ game.playerPoints }}</p>
-                <p> {{game.lastLine}} </p>
+                <p id="Name">Name: </p>
+                <p id="Lives">Lives: </p>
+                <p id="points">Score: </p>
+                <p id="lastLine"> </p>
             </div>
+            <script>
+            setInterval(function update() {
+                $.get("/get_data", function (response) {
+                    $('#Name').text("Name: "+ response.playerName),
+                    $('#Lives').text("Lives: "+ response.playerLives),
+                    $('#points').html("Score: "+ response.playerPoints),
+                    $('#lastLine').text(response.lastLine)
+                },'json',);
+            }, 500);
+        </script>
         </div>
     </body>
 </html>
