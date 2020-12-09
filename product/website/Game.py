@@ -175,6 +175,8 @@ class Game(object):
 
     # De daadwerkelijke game code!
     def gameLoop(self):
+        roundTime = self.startTime
+        endTime = 0
         waitingForHit = False # Initializer
 
         while self.isRunning:
@@ -185,40 +187,48 @@ class Game(object):
 
             # En hier moet alle game code
 
-            if not waitingForHit:  # Game start hier
-                self.countdown(self.COUNTDOWN_TIME)
-                self.lastLine = "Schiet!"
-                startTime = self.currentTime
-                waitingForHit = True
-            else:
-                # Dit is allemaal wanneer er gewacht wordt op een schot
+            if (self.isRunning):
+                # Sla de tijd op als je game start
+                roundTime = time.time()
+                if not waitingForHit:  # Game start hier
+                    self.countdown(self.COUNTDOWN_TIME)
+                    self.lastLine = "Schiet!"
+                    startTime = self.currentTime
+                    waitingForHit = True
+                else:
+                    # Dit is allemaal wanneer er gewacht wordt op een schot
 
-                if self.targetStatus:
-                    # Doelwit geraakt
-                    self.playerPoints += 1
-                    waitingForHit = False
-                    self.lastLine = "Goedzo! Je hebt nu " + str(self.playerPoints) + " punt(en)!"
-                    time.sleep(2)
+                    if self.targetStatus:
+                        # Doelwit geraakt
+                        self.playerPoints += 1
+                        waitingForHit = False
+                        self.lastLine = "Goedzo! Je hebt nu " + str(self.playerPoints) + " punt(en)!"
+                        time.sleep(2)
 
-                elif (self.currentTime - startTime) >= self.TARGET_HIT_TIMEOUT:
-                    # Timeout (te lang gewacht met schieten)
-                    self.playerLives -= 1
-                    if self.playerLives == 0:
-                        self.lastLine = "Je hebt geen levens meer! Game over!"
-                    else:
-                        self.lastLine = "Te laat met schieten! Je hebt nu maar " + str(self.playerLives) + " leven(s)."
-                    waitingForHit = False
-                    time.sleep(2)
+                    elif (self.currentTime - startTime) >= self.TARGET_HIT_TIMEOUT:
+                        # Timeout (te lang gewacht met schieten)
+                        self.playerLives -= 1
+                        if self.playerLives == 0:
+                            self.lastLine = "Je hebt geen levens meer! Game over!"
+                        else:
+                            self.lastLine = "Te laat met schieten! Je hebt nu maar " + str(self.playerLives) + " leven(s)."
+                        waitingForHit = False
+                        time.sleep(2)
 
-            if self.playerLives == 0:
-                print("done") # om te kijken of het werkt
-                cursor = database.cursor()
-                sql = "INSERT INTO Game " \
-                      "(`nickname`, `score`, `lives`, `date`) " \
-                      "VALUES (%s, %s, %s, NOW());"
-                cursor.execute(sql, (self.playerName, self.playerPoints, self.playerLives))
-                database.commit()
-                self.quit()
+                if self.playerLives == 0:
+                    # sla de tijd op als je game afgelopen is
+                    endTime = time.time()
+                    timePlayed = float(endTime - startTime)
+                    cursor = database.cursor()
+                    sql = "INSERT INTO Game " \
+                          "(`nickname`, `score`, `lives`, `date`, `time_played`) " \
+                          "VALUES (%s, %s, %s, NOW(),%s);"
+                    cursor.execute(sql, (self.playerName, self.playerPoints, self.playerLives, timePlayed))
+                    database.commit()
+                    self.quit()
+
+
+
 
 class TestObject(object):
     def __init__(self, type):
