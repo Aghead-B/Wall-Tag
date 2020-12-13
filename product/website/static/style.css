@@ -10,6 +10,7 @@ body {
     width: 100%;
 }
 
+
 #inleiding {
     text-align: center;
     color: goldenrod;
@@ -101,3 +102,4 @@ div buttonStart {
     margin-bottom: 10%;
     size: 100px;
 }
+

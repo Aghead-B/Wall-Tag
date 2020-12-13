@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link rel="stylesheet" href="/static/style.css" type="text/css" />
+        <title>{{ mytitle }}</title>
+    </head>
+    <style type="text/css">
+
+    th:tr{
+        color: blue;
+
+    }
+    tr:nth-of-type(2n){
+        border: 1px solid black;
+        background-color: rgba(150, 150, 150, 0.5);
+
+    }
+
+    td{
+        padding: 8px 8px;
+        border: 1px solid black;
+    }
+    </style>
+    <body>
+        <div class="container">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="update">Game</a></li>
+                <li><a class="active" href="/about">About</a></li>
+                <li><img id="photo" src="/static/logo.png" /></li>
+            </ul>
+            <table>
+            <!-- Table headers -->
+                <th>
+                    <tr style="color: #eee8e8; ">
+                    <td>game_id</td>
+                    <td>nickname</td>
+                    <td>score</td>
+                    <td>lives</td>
+                    <td>date</td>
+                    <td>time_played</td>
+                    </tr>
+                </th>
+
+            <!-- For loop logic of jinja template -->
+            {%for i in range(0, len)%}
+
+            <!-- table rows -->
+            <tr>
+                <td>{{results[i][0]}}</td>
+                <td>{{results[i][1]}}</td>
+                <td>{{results[i][2]}}</td>
+                <td>{{results[i][3]}}</td>
+                <td>{{results[i][4]}}</td>
+                <td>{{results[i][5]}}</td>
+
+
+            {%endfor%}
+
+            </tr>
+
+            </table>
+        </div>
+    </body>
+</html>

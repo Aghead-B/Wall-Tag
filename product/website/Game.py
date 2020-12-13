@@ -220,13 +220,12 @@ class Game(object):
                     endTime = time.time()
                     timePlayed = float(endTime - startTime)
                     cursor = database.cursor()
-                    sql = "INSERT INTO Game " \
+                    sql = "INSERT INTO `Game` " \
                           "(`nickname`, `score`, `lives`, `date`, `time_played`) " \
                           "VALUES (%s, %s, %s, NOW(),%s);"
                     cursor.execute(sql, (self.playerName, self.playerPoints, self.playerLives, timePlayed))
                     database.commit()
                     self.quit()
-
 
 
 
