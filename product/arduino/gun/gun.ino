@@ -36,7 +36,6 @@ long duration;
 int distance;
 //Start == 111
 //Stop == 222
-String startGun; 
 bool startTrue = false;
 
 void setup() {
@@ -55,14 +54,13 @@ uint8_t iteration = 0;
 
 void loop(){
      if (Serial.available() > 0){
-      startGun = Serial.readString();
-      Serial.print("StartGun");
-      if ( startGun.indexOf("111") > -1 ){
+      String startGun = Serial.readString();
+      if ( startGun.indexOf("on") > -1 ){
        startTrue = true;
-      } else if ( startGun.indexOf("222") > -1 ){
+      } else if ( startGun.indexOf("off") > -1 ){
         startTrue = false;
       }
-     } Serial.print("Start");
+     }
     printDistance();
     buttonState = digitalRead(buttonPin);
     if (buttonState == HIGH && startTrue == true) {
@@ -95,3 +93,9 @@ void printDistance() {
     // Prints the distance on the Serial Monitor
     Serial.println(distance);
 }
+
+void serialFlush(){
+  while(Serial.available() > 0) {
+    char t = Serial.read();
+  }
+}   
