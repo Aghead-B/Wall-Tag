@@ -274,6 +274,7 @@
       ]
     ],
     "rule_severities": {
+      "": "error",
       "bus_definition_conflict": "error",
       "bus_label_syntax": "error",
       "bus_to_bus_conflict": "error",
