@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <link rel="stylesheet" href="/static/style.css" type="text/css" />
+        <link rel="stylesheet" href="/static/style.css" type="text/css" media="screen" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js">
+            $.ajax({
+                url:'/play',
+                cache: false
+            })
+        </script>
         <title>Walltag</title>
     </head>
     <body>
@@ -14,16 +20,78 @@
             </ul>
             <h2>Walltag</h2>
             <div id="gegevens">
-                <p>Player_Name: {{ game.playerName }} </p>
-                <p>Lives: {{ game.playerLives }}</p>
-                <p>score: {{ game.playerPoints }}</p>
-                <p> {{game.lastLine}} </p>
+                <p id="Name">Name: </p>
+                <p id="Lives">Lives: </p>
+                <p id="points">Score: </p>
+                <p id="lastLine">  </p>
             </div>
+            <script>
+                var points = 0;
+                var Lives;
+                var Status;
+                var repeat;
+                var statloop;
+                var functionloop;
+               $.get("/get_data", function(response){
+                   Lives = Number(response.playerLives);
+                   $('#Name').text("Name: "+response.playerName),
+                   'json'})
+
+
+               function getStat() {
+                   if (Lives > 0) {
+                       repeat = setInterval(function refresh() {
+                           $.get("/status", function (data) {
+                               Status = Boolean(data.targetStatus);
+                               console.log("Status: " + Status);
+                           })
+                           if (Status == true) {
+                               clearInterval(repeat)
+                           }
+                       }, 500)
+                   }
+               }
+
+               function Quit(lastLog){
+                    $.get("/quit");
+                    lastLog;
+                    stop();
+               }
+
+               function Start(firstLog) {
+                   $.get("/start");
+                   firstLog;
+                   document.getElementById("Lives").innerText = "Levens: " + Lives;
+                   document.getElementById("points").innerText = "Punten: " + points;
+                   statloop = setTimeout(getStat, 2000);
+                   functionloop = setInterval(Loop, 3000);
+               }
+
+               function Loop() {
+                   if (Lives > 0){
+                           if (Status) {
+                               points += 1;
+                               document.getElementById("points").innerHTML = "punten: "+ points;
+                           } else {
+                               Lives -= 1;
+                               document.getElementById("Lives").innerHtml = "Levens: "+ Lives;
+                           }
+                           getStat();
+                   } else {
+                       console.log("einde Levens: "+ Lives);
+                       clearTimeout(statloop);
+                       clearInterval(functionloop);
+                       Quit(console.log("game Quit"));
+                   }
+
+
+               }
+
+               Start(console.log("game start"));
+            </script>
         </div>
     </body>
 </html>
-
-
 
 
 
