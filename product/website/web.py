@@ -45,6 +45,7 @@ def quit():
 
 @app.route("/status")
 def return_stat():
+    print(game.targetStatus)
     return jsonify(targetStatus = game.targetStatus)
 
 

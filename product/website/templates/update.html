@@ -26,65 +26,76 @@
                 <p id="lastLine">  </p>
             </div>
             <script>
+                var countdown = 3;
                 var points = 0;
                 var Lives;
                 var Status;
                 var repeat;
                 var statloop;
-                var functionloop;
                $.get("/get_data", function(response){
-                   Lives = Number(response.playerLives);
+                   Lives = response.playerLives;
                    $('#Name').text("Name: "+response.playerName),
+                   $('#Lives').text("Lives: "+ Lives),
                    'json'})
 
 
                function getStat() {
-                   if (Lives > 0) {
-                       repeat = setInterval(function refresh() {
+                   document.getElementById("lastLine").innerText = "Schiet!!";
+                   repeat = setInterval(function refresh() {
+                        if (Lives > 0) {
                            $.get("/status", function (data) {
                                Status = Boolean(data.targetStatus);
-                               console.log("Status: " + Status);
                            })
-                           if (Status == true) {
-                               clearInterval(repeat)
+                           if (Status) {
+                               document.getElementById("lastLine").innerText = "RAAK!!";
+                               clearInterval(repeat);
                            }
-                       }, 500)
-                   }
+                       }
+                   }, 500)
+                   setTimeout(function(){clearInterval(repeat);
+                       if (!Status){
+                           document.getElementById("lastLine").innerText = "Helaas Mis!";
+                       }
+                       Loop();
+                   },2000);
+                   console.log("Status: " + Status);
                }
 
                function Quit(lastLog){
                     $.get("/quit");
                     lastLog;
-                    stop();
                }
 
                function Start(firstLog) {
                    $.get("/start");
                    firstLog;
-                   document.getElementById("Lives").innerText = "Levens: " + Lives;
                    document.getElementById("points").innerText = "Punten: " + points;
-                   statloop = setTimeout(getStat, 2000);
-                   functionloop = setInterval(Loop, 3000);
+                   setTimeout(getStat,3000);
                }
 
                function Loop() {
-                   if (Lives > 0){
-                           if (Status) {
-                               points += 1;
-                               document.getElementById("points").innerHTML = "punten: "+ points;
+                   if (Lives > 0) {
+                       if (Status) {
+                           points += 1;
+                           document.getElementById("points").innerHTML = "punten: " + points;
+                       } else {
+                           Lives -= 1;
+                           document.getElementById("Lives").innerText = "Levens: " + Lives;
+                       }
+                       var timer = setInterval(function(){
+                           if (countdown <= 0){
+                               clearInterval(timer);
+                               getStat();
                            } else {
-                               Lives -= 1;
-                               document.getElementById("Lives").innerHtml = "Levens: "+ Lives;
+                               document.getElementById("lastLine").innerText = countdown + "....";
                            }
-                           getStat();
+                           countdown -=1;
+                       },1000);
                    } else {
-                       console.log("einde Levens: "+ Lives);
+                       document.getElementById("lastLine").innerText = "Helaas, You Lost!";
                        clearTimeout(statloop);
-                       clearInterval(functionloop);
                        Quit(console.log("game Quit"));
                    }
-
-
                }
 
                Start(console.log("game start"));
