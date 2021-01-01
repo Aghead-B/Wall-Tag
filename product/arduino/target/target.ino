@@ -7,9 +7,9 @@ const int statusPinnen[] = {5,0,0,0,0,0};
 */
 
 
-const int irPinnen[] = {41,40,39,38,37,36};
+const int irPinnen[] = {A5, A4, A3, A2, A1, A0};
 
-const int statusPinnen[] = {18,19,20,21,28,29};
+const int statusPinnen[] = {3, 2, 0, 1, 8, 9};
 
 const int aantalSensoren = 6;
 char ledcontrol[aantalSensoren];
@@ -20,6 +20,7 @@ void setup() {
     // put your setup code here, to run once:
     for (int i=0; i<aantalSensoren; i++) {
       pinMode(irPinnen[i], INPUT);
+      digitalWrite(irPinnen[i], HIGH); // Internal pullup
       pinMode(statusPinnen[i], OUTPUT);
       digitalWrite(statusPinnen[i], HIGH);
     }
@@ -54,14 +55,20 @@ void loop(){
             digitalWrite(statusPinnen[i], LOW);
           } else{
             digitalWrite(statusPinnen[i], HIGH);
-          }
+          }  
         }
       }
     }
 
     Serial.write("r");
     for(int i = 0; i<aantalSensoren; i++) {
-      geraaktePin[i] = digitalRead(irPinnen[i]);
+      int pinRead = digitalRead(irPinnen[i]);
+      // Hier moet de logica omgedraaid worden, omdat de sensor LOW is wanneer die geraakt wordt.
+      if (pinRead == 0) {
+        geraaktePin[i] = 1;
+      } else {
+        geraaktePin[i] = 0;
+      }
       Serial.print(geraaktePin[i]);
     }
     Serial.write("\n");
