@@ -42,7 +42,15 @@ def info():
     cursor.execute("SELECT `game_id`, `nickname`, `score`, `lives`, `date`, `time_played` FROM `Game` ORDER BY `score` DESC LIMIT 25;")
     results = cursor.fetchall()
     pagetitle = "Walltag"
-    return render_template("about.html", mytitle=pagetitle, len = len(results), results = results)
+    return render_template('about.html', mytitle=pagetitle, len=len(results), results=results)
+
+
+@app.route('/monitoring')
+def control():
+    cursor = database.cursor()
+    cursor.execute("SELECT SUM(`time_played`) FROM `Game`;")
+    result = cursor.fetchone()
+    return render_template('monitoring.html', speeltijd=result, game=game)
 
 
 if __name__ == "__main__":

@@ -76,14 +76,16 @@ class Game(object):
         if not self.testMode:
             try:
                 self.serTarget = serial.Serial('/dev/serial/by-id/usb-1a86_USB2.0-Serial-if00-port0', 9600, timeout=1)
+                self.serTargetStatus = "De targets zijn aangesloten!"
             except:
-                self.lastLine = "De targets zijn niet aangesloten!"
+                self.serTargetStatus = "De targets zijn niet aangesloten!"
                 sys.exit()
 
             try:
                 self.serGun = serial.Serial('/dev/serial/by-id/usb-Arduino_LLC_Arduino_Leonardo-if00', 9600, timeout=1)
+                self.serGunStatus = "De gun is  aangesloten!"
             except:
-                self.lastLine = "De gun is niet aangesloten!"
+                self.serGunStatus = "De gun is niet aangesloten!"
                 sys.exit()
         else:
             self.serTarget = TestObject('target')
@@ -183,7 +185,7 @@ class Game(object):
             time.sleep(1 / self.updateRate)
 
             if self.DEBUG:
-                self.lastLine = "DEBUG: " + str(int(self.elapsedTime)) + "s : " + str(self.gunDistance) + "cm, target hit = " + str(self.targetStatus)
+               self.lastLine = "DEBUG: " + str(int(self.elapsedTime)) + "s : " + str(self.gunDistance) + "cm, target hit = " + str(self.targetStatus)
 
             # En hier moet alle game code
 
@@ -219,7 +221,9 @@ class Game(object):
                     # sla de tijd op als je game afgelopen is
                     endTime = time.time()
                     timePlayed = float(endTime - startTime)
+                    # hier wordt verbinding gemaakt met de database
                     cursor = database.cursor()
+                    # gevegens worden naar de database gestuurd
                     sql = "INSERT INTO `Game` " \
                           "(`nickname`, `score`, `lives`, `date`, `time_played`) " \
                           "VALUES (%s, %s, %s, NOW(),%s);"
