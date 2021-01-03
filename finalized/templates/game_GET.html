@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Game{% endblock %}
+{% block subtitle %}Sta je klaar?{% endblock %}
+
+{% block body %}
+<h2>Walltag</h2>
+<p>Uitleg over walltag hier of iets</p>
+{% if leaderboard %}
+<h2>Leaderboard</h2>
+<table>
+  <tr>
+      <th>#</th>
+      <th>Naam</th>
+      <th>Score</th>
+      <th>Tijd</th>
+      <th>Datum</th>
+  </tr>
+  {% for i in range(leaderboard|length) %}
+  <tr>
+    <td>{{ i + 1 }}</td>
+    <td>{{leaderboard[i][1]}}</td>
+    <td>{{leaderboard[i][2]}}</td>
+    <td>{{leaderboard[i][5]}}</td>
+    <td>{{leaderboard[i][4].strftime('%d-%m-%Y')}}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+{% endblock %}

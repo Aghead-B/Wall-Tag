@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{% block title %}{% endblock %} - Walltag</title>
+    <link rel="stylesheet" href="/static/style.css" type="text/css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  </head>
+  <body>
+    <div id="header">
+      <div class="container">
+        <ul>
+          <li {% if request.path == '/' %}class="active"{% endif %}><a href="/">Home</a></li>
+          <li {% if request.path == '/game' %}class="active"{% endif %}><a href="/game">Game</a></li>
+          <li {% if request.path == '/about' %}class="active"{% endif %}><a href="/about">About</a></li>
+          <li {% if request.path == '/monitoring' %}class="active"{% endif %}><a href="/monitoring">Monitoring</a></li>
+        </ul>
+        <img onclick="$(this).hide();" src="/static/logo.png" />
+        <h1 id="header-title">{% block subtitle %}{% endblock %}</h1>
+      </div>
+    </div>
+    <div id="main">
+      <div class="container">
+      {% block body %}{% endblock %}
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,3 @@
+pyserial
+websockets
+mysql-connector-python

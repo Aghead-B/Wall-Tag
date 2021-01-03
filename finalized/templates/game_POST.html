@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+
+{% block title %}Game{% endblock %}
+{% block subtitle %}Sta je klaar?{% endblock %}
+
+{% block body %}
+<div id="game">
+  <div id="messages" style="display: none;">
+  websocket:<br />
+  </div>
+  
+  <div id="confirm-start" class="text-center">
+    <h2>Zet je telefoon klaar en druk op de knop hieronder om te beginnen.</h2>
+    <button id="confirm-start-button">Start!</button>
+  </div>
+  
+  <div id="game-status" class="text-center" style="display:none;">
+    <div id="game-levens"></div><div id="game-punten"></div>
+  </div>
+  
+  <div id="game-countdown" class="text-center" style="display:none;">
+    <div id="game-countdown-seconds" class="text-center"></div>
+  </div>
+  
+  <div id="game-finished" class="text-center" style="display:none;">
+    <h2 id="game-finished-success" style="display:none;"></h2>
+    <h2 id="game-finished-fail" style="display:none;"></h2>
+  </div>
+ 
+</div>
+<div id="game-error" style="display:none;">
+</div>
+<script>
+  var ws = new WebSocket("ws://{{ hostname }}:5678/");
+  var gameRunning = true;
+  var waitingForHit = false;
+  var countdownFunction;
+  var countdownFinishedFunction;
+  var countdownTimeLeft = 0;
+  var playerName = "{{ playername }}";
+  var tm;
+  // Ping pong borrowed from https://stackoverflow.com/a/39765960
+  
+  ///////////////
+  // Ping pong //
+  ///////////////
+  
+  function ping() {
+    ws.send('__ping__');
+    tm = setTimeout(function () {
+      $("#game-error").text("De verbinding was verloren.");
+      $("#game").hide();
+      $("#game-error").show();
+    }, 2000);
+  }
+  
+  function pong() {
+    clearTimeout(tm);
+  }
+  
+  ws.onopen = function () {
+    setInterval(ping, 3000);
+    ws.send("game");
+  }
+  
+  
+  // Start game on button click
+  $("#confirm-start-button").click(function() {
+    ws.send("clear targets");
+    ws.send("start");
+    ws.send("playername " + playerName);
+    $("#confirm-start").hide();
+    $("#game-countdown").show();
+    $("#game-status").show();
+    $("#header-title").slideToggle("fast", function(){});
+    countdown(3);
+  });
+  
+  ///////////////////////
+  // The countdown bit //
+  ///////////////////////
+  
+  function countdownFinished() {
+    if(countdownTimeLeft <= 0){
+      clearInterval(countdownFunction);
+      setTimeout(function(){ 
+        ws.send("waiting for hit");
+        setTimeout(function(){waitingForHit = true;}, 1000);
+        
+        $("#game-countdown-seconds").delay(1000).text("...");
+        
+      }, 900);
+      clearInterval(countdownFinishedFunction);
+    }
+  };
+  
+  function actualCountdown(){
+    countdownTimeLeft -= 1;
+    $("#game-countdown-seconds").text(countdownTimeLeft);
+  }
+  
+  // Count down to 0
+  function countdown(seconds) {
+    $("#game-countdown-seconds").css("background", "");
+    countdownTimeLeft = seconds;
+    countdownFunction = setInterval(actualCountdown, 1000);
+    countdownFinishedFunction = setInterval(countdownFinished, 100);
+    $("#game-countdown-seconds").text(seconds);
+    
+  }
+  
+  ////////////////////////
+  // Websocket messages //
+  ////////////////////////
+  
+  // WebSocket message receiver
+  ws.onmessage = function (event) {
+    var data = event.data;
+    var error = false;
+    var dataIsJson = isJson(data);
+    
+    
+    //////////////////////////
+    // Error catching time! //
+    //////////////////////////
+    
+    // Ping pong
+    if (data == '__pong__') {
+      pong();
+      return;
+    }
+    
+    // This game doesn't allow multiple connections!
+    if (data == "connection not allowed") {
+      $("#game-error").text("Het spel kan niet gestart worden! Controleer of iemand anders niet al aan het spelen is.");
+      error = true;
+    }
+    // Catch error=true
+    else if (dataIsJson) {
+      var jsonData = JSON.parse(data);
+      if (jsonData.error == true) {
+        $("#game-error").text("Het spel kan niet gestart worden! Controleer of de targets en gun zijn aangesloten.");
+        error = true;
+      }
+    }
+    
+    // If there is an error, show it!
+    if (error) {
+      $("#game").hide();
+      $("#game-error").show();
+    }
+    
+    
+    /////////////////////
+    // No errors here! //
+    /////////////////////
+    
+    // Normal game message handling. No errors here!
+    else {
+      if (dataIsJson) {
+        $("#game-levens").text(jsonData.lives);
+        $("#game-punten").text(jsonData.points);
+        if (waitingForHit) {
+          if (jsonData.waitingForHit == false) {
+            waitingForHit = false;
+            if (jsonData.targetHit == true) {
+              $("#game-countdown-seconds").css("background", "#38cc77");
+              $("#game-countdown-seconds").text(":)");
+            } else {
+              $("#game-countdown-seconds").css("background", "#e74c3c");
+              $("#game-countdown-seconds").text(":(");
+            }
+            ws.send("clear targets");
+            if (jsonData.gameFinished == true) {
+              $("#game-countdown").hide();
+              $("#game-finished").show();
+              if (jsonData.lives == 0) {
+                $("#game-finished-fail").show();
+                $("#game-finished-fail").text("Game over! Je eindigde met " + jsonData.points + " punten.");
+              } else {
+                $("#game-finished-success").show();
+                $("#game-finished-success").text("Goed gedaan! Je eindigde met " + jsonData.points + " punten en " + jsonData.lives + " leven(s).");
+              }
+            } else {
+              setTimeout(function(){countdown(3);}, 2000);
+            }
+          }
+        }
+      }
+    }
+  };
+  
+  function isJson(str) {
+    try {
+      JSON.parse(str);
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
+</script>
+{% endblock %}

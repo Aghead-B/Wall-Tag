@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Monitoring{% endblock %}
+{% block subtitle %}Monitoring{% endblock %}
+
+{% block body %}
+<h2>Gegevens</h2>
+<div id="gegevens">
+    <p>Speeltijd: {{ playtime }} minuten</p>
+    <p>Targets aangesloten: <span id="targetstatus">...</span> </p>
+    <p>Gun aangesloten: <span id="gunstatus">...</span> </p>
+    <p>magneet sensor: moet nog komen</p>
+</div>
+<script>
+var ws = new WebSocket("ws://{{ hostname }}:5678/");
+
+setInterval(function(){ws.send("hardwarestatus");}, 1000);
+
+ws.onmessage = function (event) {
+  var data = event.data;
+  var dataIsJson = isJson(data);
+  
+  if (dataIsJson) {
+    data = JSON.parse(data)
+    console.log(data)
+    if (data.target == true) {
+      $("#targetstatus").text("Ja");
+    } else {
+      $("#targetstatus").text("Nee!");
+    }
+    if (data.gun == true) {
+      $("#gunstatus").text("Ja");
+    } else {
+      $("#gunstatus").text("Nee!");
+    }
+  }
+  
+  function isJson(str) {
+    try {
+      JSON.parse(str);
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
+}
+</script>
+{% endblock %}
+
