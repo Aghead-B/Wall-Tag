@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+{% block subtitle %}Welkom{% endblock %}
+
+{% block body %}
+<form id="formulier" action="/game"  method="post" autocomplete="off">
+  <p>Walltag draait om nauwkeurigheid en snelheid, je begint met 3 levens en een gun.</p>
+  <p>De bedoeling is je de juiste target binnen 2 seconden raakt.</p>
+  </p>
+  <label>Vul je naam in:</label>
+  {% if playernameNotAllowed %}<small class="error">Alleen letters en getallen zijn toegestaan!</small>{% endif %}
+  <input type="text" id="player_name" name="player_name" placeholder="Lillian..." required>
+  <button id="button" type="submit" value="Submit">Start!</button>
+</form>
+{% endblock %}
