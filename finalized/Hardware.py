@@ -84,15 +84,15 @@ class Hardware(object):
         self.errorHandlingThread = threading.Thread(target=self.errorHandling)
         self.errorHandlingThread.start()
 
+        self.readHallEffectThread = threading.Thread(target=self.readHallEffect)
+        self.readHallEffectThread.start()
+
         if not self.error:
             self.readGunThread = threading.Thread(target=self.readGun)
             self.readGunThread.start()
 
             self.readTargetsThread = threading.Thread(target=self.readTargets)
             self.readTargetsThread.start()
-
-            self.readHallEffectThread = threading.Thread(target=self.readHallEffect)
-            self.readHallEffectThread.start()
 
     def readLine(self, serialObject, targets=False):
         if self.isRunning and not self.error:
