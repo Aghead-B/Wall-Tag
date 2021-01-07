@@ -9,7 +9,7 @@
     <p>Speeltijd: {{ playtime }} minuten</p>
     <p>Targets aangesloten: <span id="targetstatus">...</span> </p>
     <p>Gun aangesloten: <span id="gunstatus">...</span> </p>
-    <p>magneet sensor: moet nog komen</p>
+    <p>Gun in houder: <span id="hallstatus">...</span></p>
 </div>
 <script>
 var ws = new WebSocket("ws://{{ hostname }}:5678/");
@@ -32,6 +32,11 @@ ws.onmessage = function (event) {
       $("#gunstatus").text("Ja");
     } else {
       $("#gunstatus").text("Nee!");
+    }
+    if (data.halleffect == true) {
+      $("#hallstatus").text("Ja");
+    } else {
+      $("#hallstatus").text("Nee!");
     }
   }
   

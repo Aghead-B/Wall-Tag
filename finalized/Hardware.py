@@ -7,6 +7,8 @@ import sys
 import random
 import math
 import os
+import RPi.GPIO as gpio
+
 
 class TargetDebounce(object):
     latest = []
@@ -59,16 +61,22 @@ class TargetDebounce(object):
 class Hardware(object):
     GUN_DISTANCE_SAMPLES = 3
     NUMBER_TARGETS = 6
+    HALLEFFECT_PIN = 14
+    BUZZER_PIN = 15
 
     error = False
     targetStatus = []
     gunDistance = 0
     isRunning = True
+    hallEffectStatus = False
 
     serTarget = None
     serGun = None
 
     def __init__(self):
+        gpio.setmode(gpio.BCM)
+        gpio.setwarnings(False)
+        
         for i in range(self.NUMBER_TARGETS):
             self.targetStatus.append(0)
         self._connectSerial()
@@ -82,6 +90,9 @@ class Hardware(object):
 
             self.readTargetsThread = threading.Thread(target=self.readTargets)
             self.readTargetsThread.start()
+
+            self.readHallEffectThread = threading.Thread(target=self.readHallEffect)
+            self.readHallEffectThread.start()
 
     def readLine(self, serialObject, targets=False):
         if self.isRunning and not self.error:
@@ -207,16 +218,31 @@ class Hardware(object):
             else:
                 self.writeLine(self.serGun, 'off')
 
+    def readHallEffect(self):
+        gpio.setup(self.HALLEFFECT_PIN, gpio.IN)
+        while True:
+            if(gpio.input(self.HALLEFFECT_PIN) == False):
+                self.hallEffectStatus = True
+            else:
+                self.hallEffectStatus = False
+    
+    def buzz(self, seconds):
+        gpio.setup(self.BUZZER_PIN, gpio.OUT)
+        gpio.output(self.BUZZER_PIN, False)
+        gpio.output(self.BUZZER_PIN, True)
+        time.sleep(seconds)
+        gpio.output(self.BUZZER_PIN, False)
+        
     def getRandomTargetIndex(self):
         return math.floor(random.random()*self.NUMBER_TARGETS)
         
     def getInfo(self):
         if len(self.targetStatus) != self.NUMBER_TARGETS:
-            print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-        return {'error': self.error, 'gunDistance': self.gunDistance, 'targetStatus': self.targetStatus}
+            self.error = True
+        return {'error': self.error, 'gunDistance': self.gunDistance, 'targetStatus': self.targetStatus, 'halleffect': self.hallEffectStatus}
         
     def getHardwareStatus(self):
-        status = {'target': True, 'gun': True}
+        status = {'target': True, 'gun': True, 'halleffect': self.hallEffectStatus}
         if self.serTarget == None:
             status["target"] = False
         if self.serGun == None:

@@ -94,18 +94,24 @@ class Game(object):
         
         self.gameLives -= 1
         self.checkGameFinished()
+        self.hardwareObject.buzz(.2)
     
     def checkGameFinished(self):
         if self.gameLives == 0:
             self.gameFinished = True
         if self.startTime - time.time() > self.MAXIMUM_PLAYTIME:
             self.gameFinished = True
+            
         if self.gameFinished:
+            
             timeEnded = time.time()
             time.sleep(1)
             info = self.info.copy()
             info["timePlayed"] = timeEnded - self.startTime
             db.putGameRecord(info)
+            self.hardwareObject.buzz(.2)
+            time.sleep(.1)
+            self.hardwareObject.buzz(.2)
     
     def getHardwareStatus(self):
         return self.hardwareObject.getHardwareStatus()
