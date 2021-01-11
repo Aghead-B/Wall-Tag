@@ -82,6 +82,7 @@ class Game(object):
                         self.waitingForHit = False
                         self.penalty()
                         break
+                        
     def reward(self):
         self.gamePoints += self.HIT_REWARD
         self.checkGameFinished()

@@ -5,12 +5,9 @@
 
 {% block body %}
 <div id="game">
-  <div id="messages" style="display: none;">
-  websocket:<br />
-  </div>
   
   <div id="confirm-start" class="text-center">
-    <h2>Zet je telefoon klaar en druk op de knop hieronder om te beginnen.</h2>
+    <h2 id="confirm-text">Zet je telefoon klaar en druk op de knop hieronder om te beginnen.</h2>
     <button id="confirm-start-button">Start!</button>
   </div>
   
@@ -32,14 +29,18 @@
 </div>
 <script>
   var ws = new WebSocket("ws://{{ hostname }}:5678/");
-  var gameRunning = true;
+  var gameRunning = false;
+  var pressedStart = false;
   var waitingForHit = false;
   var countdownFunction;
   var countdownFinishedFunction;
   var countdownTimeLeft = 0;
   var playerName = "{{ playername }}";
   var tm;
-  // Ping pong borrowed from https://stackoverflow.com/a/39765960
+  var hallEffect = true;
+  var tooCloseCounter = 0;
+  var tooCloseCounterMax = 30;
+  var minGunDistance = 100;
   
   ///////////////
   // Ping pong //
@@ -48,9 +49,11 @@
   function ping() {
     ws.send('__ping__');
     tm = setTimeout(function () {
-      $("#game-error").text("De verbinding was verloren.");
-      $("#game").hide();
-      $("#game-error").show();
+      if (gameRunning) {
+        $("#game-error").text("De verbinding was verloren.");
+        $("#game").hide();
+        $("#game-error").show();
+      }
     }, 2000);
   }
   
@@ -66,14 +69,20 @@
   
   // Start game on button click
   $("#confirm-start-button").click(function() {
-    ws.send("clear targets");
-    ws.send("start");
-    ws.send("playername " + playerName);
-    $("#confirm-start").hide();
-    $("#game-countdown").show();
-    $("#game-status").show();
-    $("#header-title").slideToggle("fast", function(){});
-    countdown(3);
+    if (hallEffect == false) {
+      gameRunning = true;
+      ws.send("clear targets");
+      ws.send("start");
+      ws.send("playername " + playerName);
+      $("#confirm-start").hide();
+      $("#game-countdown").show();
+      $("#game-status").show();
+      $("#header-title").slideToggle("fast", function(){});
+      countdown(3);
+    } else {
+      pressedStart = true;
+      $("#confirm-text").text("Haal de gun uit de houder! Het spel begint dan vanzelf.");
+    }
   });
   
   ///////////////////////
@@ -135,19 +144,29 @@
       $("#game-error").text("Het spel kan niet gestart worden! Controleer of iemand anders niet al aan het spelen is.");
       error = true;
     }
-    // Catch error=true
+    // Catch errors from JSON
     else if (dataIsJson) {
       var jsonData = JSON.parse(data);
       if (jsonData.error == true) {
         $("#game-error").text("Het spel kan niet gestart worden! Controleer of de targets en gun zijn aangesloten.");
         error = true;
       }
+      if (gameRunning && hallEffect == true) {
+        $("#game-error").text("Het spel is afgebroken omdat het pistool in de houder zit.");
+        error = true;
+      }
+      if (gameRunning && tooCloseCounter >= tooCloseCounterMax) {
+        $("#game-error").text("Je staat te dicht bij de doelwitten of richt ergens anders op. Het spel is afgebroken.");
+        error = true;
+      }
     }
     
     // If there is an error, show it!
     if (error) {
+      gameRunning = false;
       $("#game").hide();
       $("#game-error").show();
+      ws.close();
     }
     
     
@@ -158,9 +177,18 @@
     // Normal game message handling. No errors here!
     else {
       if (dataIsJson) {
+        if (pressedStart == true && gameRunning == false) {
+          $("#confirm-start-button").click();
+        }
         $("#game-levens").text(jsonData.lives);
         $("#game-punten").text(jsonData.points);
-        if (waitingForHit) {
+        hallEffect = jsonData.halleffect;
+        
+        if (gameRunning && jsonData.gunDistance < minGunDistance) {
+          tooCloseCounter++;
+        }
+        
+        if (waitingForHit && gameRunning) {
           if (jsonData.waitingForHit == false) {
             waitingForHit = false;
             if (jsonData.targetHit == true) {
@@ -172,6 +200,7 @@
             }
             ws.send("clear targets");
             if (jsonData.gameFinished == true) {
+              gameRunning = false;
               $("#game-countdown").hide();
               $("#game-finished").show();
               if (jsonData.lives == 0) {
