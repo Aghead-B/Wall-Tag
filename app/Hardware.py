@@ -101,7 +101,7 @@ class Hardware(object):
                     if targets:
                         line = serialObject.readline()
                         decoded = line.decode('ascii')
-                        return line
+                        return decoded
                     else:
                         line = serialObject.readline()
                         decoded = line.decode('ascii')
