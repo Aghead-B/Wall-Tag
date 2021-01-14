@@ -40,7 +40,7 @@
   var hallEffect = true;
   var tooCloseCounter = 0;
   var tooCloseCounterMax = 30;
-  var minGunDistance = 100;
+  var minGunDistance = 150;
   
   ///////////////
   // Ping pong //
@@ -110,12 +110,13 @@
   
   // Count down to 0
   function countdown(seconds) {
-    $("#game-countdown-seconds").css("background", "");
-    countdownTimeLeft = seconds;
-    countdownFunction = setInterval(actualCountdown, 1000);
-    countdownFinishedFunction = setInterval(countdownFinished, 100);
-    $("#game-countdown-seconds").text(seconds);
-    
+    if (gameRunning) {
+      $("#game-countdown-seconds").css("background", "");
+      countdownTimeLeft = seconds;
+      countdownFunction = setInterval(actualCountdown, 1000);
+      countdownFinishedFunction = setInterval(countdownFinished, 100);
+      $("#game-countdown-seconds").text(seconds);
+    }
   }
   
   ////////////////////////
