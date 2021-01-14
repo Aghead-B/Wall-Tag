@@ -1,3 +1,4 @@
+#dit bestand organiseerd de verbindingen.
 import threading
 import websockets
 import asyncio
@@ -7,11 +8,13 @@ from Game import Game
 import websockets
 import asyncio
 
+#deze zet de verbinding op en regelt de rest van het hele spel.
 class SocketManager(object):
     activeConnections = []
     activeGameConnections = []
     gameObject = None
-        
+
+    #als de websocket zich bevind in een actieve game connectie ververst hij met 0,05 sec de else is een failsafe.
     async def sender(self, websocket, path):
         if websocket in self.activeGameConnections:
             await websocket.send(json.dumps(self.gameObject.getInfo()))
@@ -19,8 +22,10 @@ class SocketManager(object):
         else:
             await websocket.send("hello!")
             await asyncio.sleep(.5)
+
     
     async def receiver(self, websocket, path):
+        #controleert op 1 active game connection op het moment dat de websocket bericht ontvangt
         async for message in websocket:
             print("Websocket: " + message)
             if message == "game":
@@ -28,7 +33,8 @@ class SocketManager(object):
                     await websocket.send("connection not allowed")
                 else:
                     self.activeGameConnections.append(websocket)
-                    
+
+            # het protocol waarmee de websocket cumminiceert naar de game.
             if websocket in self.activeGameConnections:
                 if message == "start":
                     self.gameObject.enableGun()
@@ -52,10 +58,12 @@ class SocketManager(object):
                 
             else:
                 print(message)
+
                 
     async def handle(self, websocket, path):
         self.activeConnections.append(websocket)
         print("Websocket: connection opened")
+        #zorgt ervoor dat de websockets alleen kunnen verzenden of ontavngen (berichten) door te annuleren als de ander bezig is.
         while websocket in self.activeConnections:
             try:
                 send_task = asyncio.ensure_future(
@@ -72,6 +80,8 @@ class SocketManager(object):
                         raise exception
                 for task in pending:
                     task.cancel()
+
+            #verwijdert de mislukte met zowel actieve als actieve game verbindingen.
             except Exception as e:
                 print("Websocket: " + str(e))
                 print("Websocket: connection closed")
@@ -80,7 +90,8 @@ class SocketManager(object):
                     self.activeGameConnections.remove(websocket)
         if len(self.activeGameConnections) == 0:
             self.gameObject.disableGun()
-        
+
+    #het start de websocket in een thread en definieert "gameObject".
     def start(self):
         print("Start websocket...")
         self.gameObject = Game()

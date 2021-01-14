@@ -45,7 +45,8 @@
   ///////////////
   // Ping pong //
   ///////////////
-  
+
+  //start na 2 seconden van openen van de websocket ping()
   function ping() {
     ws.send('__ping__');
     tm = setTimeout(function () {
@@ -60,7 +61,8 @@
   function pong() {
     clearTimeout(tm);
   }
-  
+
+  //stuurt een 'message' naar websocket en start ping() om 3 sec.
   ws.onopen = function () {
     setInterval(ping, 3000);
     ws.send("game");
@@ -88,7 +90,8 @@
   ///////////////////////
   // The countdown bit //
   ///////////////////////
-  
+
+  // end here(countdown obviously).
   function countdownFinished() {
     if(countdownTimeLeft <= 0){
       clearInterval(countdownFunction);
@@ -108,7 +111,7 @@
     $("#game-countdown-seconds").text(countdownTimeLeft);
   }
   
-  // Count down to 0
+  // Count down to 0 (start here)
   function countdown(seconds) {
     if (gameRunning) {
       $("#game-countdown-seconds").css("background", "");
@@ -123,7 +126,7 @@
   // Websocket messages //
   ////////////////////////
   
-  // WebSocket message receiver
+  // converts received ws. (websocket) messages to JS readable data.
   ws.onmessage = function (event) {
     var data = event.data;
     var error = false;
@@ -219,7 +222,7 @@
       }
     }
   };
-  
+  //function for line 133 to parse every message received.
   function isJson(str) {
     try {
       JSON.parse(str);
