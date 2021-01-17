@@ -1,3 +1,4 @@
+#this file is for obtaining the hardware information and commanding.
 import threading
 import time
 
@@ -22,22 +23,25 @@ class TargetDebounce(object):
             self.currentStatus.append(0)
             self.differenceCounter.append(0)
 
+    #this starts the update methods in an orderly fashion.
     def update(self, list):
         self.setLatest(list)
         self.processLatest()
         self.updateStatus()
 
+    #this makes sure that lastest is up to date.
     def setLatest(self, list):
         for i in range(self.NUMBER_TARGETS):
             self.latest[i] = int(list[i])
 
+    # this compares the 2 lists and stores the difference in the third.
     def processLatest(self):
         for i in range(self.NUMBER_TARGETS):
             latest = self.latest[i]
             current = self.currentStatus[i]
             if current != latest:
                 self.differenceCounter[i] += 1
-
+    # ---
     def updateStatus(self):
         for i in range(self.NUMBER_TARGETS):
             difference = self.differenceCounter[i]
@@ -94,6 +98,7 @@ class Hardware(object):
             self.readTargetsThread = threading.Thread(target=self.readTargets)
             self.readTargetsThread.start()
 
+    #wrapper function to get errors.
     def readLine(self, serialObject, targets=False):
         if self.isRunning and not self.error:
             while True:
@@ -119,12 +124,14 @@ class Hardware(object):
         else:
             return '0'
 
+    #tries to write an encoded string in utf-8 to whatever the serialobject is.
     def writeLine(self, serialObject, string):
         try:
             serialObject.write(string.encode())
         except serial.SerialException:
             self.error = True
 
+    #determining which hardware is which through their serial output. (incl. error handling)
     def _connectSerial(self):
         print("Hardware: trying to connect hardware")
         while True:
@@ -168,7 +175,7 @@ class Hardware(object):
                 self.error = True
                 break
        
-
+    # every 10/sec error check!
     def errorHandling(self):
         while self.isRunning:
             time.sleep(.1)
@@ -176,6 +183,7 @@ class Hardware(object):
                 print("Hardware: oh no an error!")
                 self._connectSerial()
 
+    #converts serial of targetstatus into comprensive message and list for the game.
     def readTargets(self):
         """ Expects a message like 'r010000' over serial """
         debouncer = TargetDebounce(number=self.NUMBER_TARGETS)
@@ -183,16 +191,17 @@ class Hardware(object):
             if not self.error:
                 lines = []
                 for i in range(5):
-                    lines.append(self.readLine(self.serTarget, targets=True))
+                    lines.append(self.readLine(self.serTarget, targets=True))   # check l.102
                 for line in lines:
                     line = line.strip()
                     if len(line) == 7 and line[0] == 'r':
                         line = line[1:7]
                         list = [] 
                         list[:0] = line
-                        debouncer.update(list)
-                        self.targetStatus = debouncer.getStatus()
+                        debouncer.update(list)      # check l.27
+                        self.targetStatus = debouncer.getStatus()       # check l.61
 
+    #turns received list into iterable string for arduino to set target to by bool value of number.
     def setTargets(self, list):
         if not self.error:
             string = 'w'
@@ -200,17 +209,19 @@ class Hardware(object):
                 string += str(char)
             self.writeLine(self.serTarget, string + "\n")
 
+    #determines the average distance of the gun.
     def readGun(self):
         while self.isRunning:
             if not self.error:
                 distanceSum = 0
                 i = 0
                 while i < self.GUN_DISTANCE_SAMPLES:
-                    distanceSum += int(self.readLine(self.serGun))
+                    distanceSum += int(self.readLine(self.serGun))  # check l.102
                     i += 1
                 distance = distanceSum / self.GUN_DISTANCE_SAMPLES
                 self.gunDistance = round(distance)
 
+    #turn the (visible) laser on or off.
     def setGun(self, boolean):
         if not self.error:
             if boolean == True:
@@ -218,6 +229,7 @@ class Hardware(object):
             else:
                 self.writeLine(self.serGun, 'off')
 
+    #checks if gun is in holster by halleffect.
     def readHallEffect(self):
         gpio.setup(self.HALLEFFECT_PIN, gpio.IN)
         while True:
@@ -225,22 +237,26 @@ class Hardware(object):
                 self.hallEffectStatus = True
             else:
                 self.hallEffectStatus = False
-    
+
+    #defines the order of operation for buzzer.
     def buzz(self, seconds):
         gpio.setup(self.BUZZER_PIN, gpio.OUT)
         gpio.output(self.BUZZER_PIN, False)
         gpio.output(self.BUZZER_PIN, True)
         time.sleep(seconds)
         gpio.output(self.BUZZER_PIN, False)
-        
+
+
     def getRandomTargetIndex(self):
         return math.floor(random.random()*self.NUMBER_TARGETS)
-        
+
+    #delivers info in json readable format.
     def getInfo(self):
         if len(self.targetStatus) != self.NUMBER_TARGETS:
             self.error = True
         return {'error': self.error, 'gunDistance': self.gunDistance, 'targetStatus': self.targetStatus, 'halleffect': self.hallEffectStatus}
-        
+
+    #returns hardware connection status and the halleffect status.
     def getHardwareStatus(self):
         status = {'target': True, 'gun': True, 'halleffect': self.hallEffectStatus}
         if self.serTarget == None:

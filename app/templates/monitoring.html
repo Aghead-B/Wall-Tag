@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Monitoring{% endblock %}
+{% block title %}inMonitorg{% endblock %}
 {% block subtitle %}Monitoring{% endblock %}
 
 {% block body %}
@@ -16,10 +16,12 @@ var ws = new WebSocket("ws://{{ hostname }}:5678/");
 
 setInterval(function(){ws.send("hardwarestatus");}, 1000);
 
+// converts received ws. (websocket) messages to JS readable data.
 ws.onmessage = function (event) {
   var data = event.data;
   var dataIsJson = isJson(data);
-  
+
+  //displays the status of the components.
   if (dataIsJson) {
     data = JSON.parse(data)
     console.log(data)
@@ -39,7 +41,8 @@ ws.onmessage = function (event) {
       $("#hallstatus").text("Nee!");
     }
   }
-  
+
+  //function for line 133 to parse every message received.
   function isJson(str) {
     try {
       JSON.parse(str);

@@ -1,9 +1,11 @@
+#this file requests, keeps track of and organzizes all system information.
 from Hardware import Hardware
 import threading
 import json
 import time
 import db
 
+#this is the actual game that is played with its rules.
 class Game(object):
 
     hardwareObject = None
@@ -29,7 +31,8 @@ class Game(object):
         infoCollectorThread.start()
         waitForHitThread = threading.Thread(target=self.waitForHit, args=[])
         waitForHitThread.start()
-        
+
+    # requests and expands on the dictionary formed in hardware() from hardware.py.
     def infoCollector(self):
         while True:
             info = self.hardwareObject.getInfo()
@@ -43,7 +46,8 @@ class Game(object):
                 'timePlayed': time.time() - self.startTime
             })
             self.info = info
-        
+
+    # returns the "new and updated" dictionary.
     def getInfo(self):
         return self.info
         
@@ -60,7 +64,8 @@ class Game(object):
         self.gameLives = self.DEFAULT_LIVES
         self.gamePoints = self.DEFAULT_POINTS
         self.startTime = time.time()
-                
+
+    # compares the status of targets as a list and acts accordingly by the result of that list. (2.5 sec)
     def waitForHit(self):
         while True:
             if self.waitingForHit:
@@ -96,7 +101,8 @@ class Game(object):
         self.gameLives -= 1
         self.checkGameFinished()
         self.hardwareObject.buzz(.2)
-    
+
+    #checks if the conditions for the game to finish have been met and stores the results.
     def checkGameFinished(self):
         if self.gameLives == 0:
             self.gameFinished = True
