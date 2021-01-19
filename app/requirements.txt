@@ -1,3 +1,4 @@
 pyserial
 websockets
 mysql-connector-python
+rpi.gpio

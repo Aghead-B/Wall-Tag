@@ -5,9 +5,6 @@ import asyncio
 import json
 from Game import Game
 
-import websockets
-import asyncio
-
 #deze zet de verbinding op en regelt de rest van het hele spel.
 class SocketManager(object):
     activeConnections = []
