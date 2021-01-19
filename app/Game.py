@@ -22,7 +22,7 @@ class Game(object):
     DEFAULT_POINTS = 0
     HIT_REWARD = 50
     NO_HIT_PENALTY = 70
-    MAXIMUM_PLAYTIME = 5
+    MAXIMUM_PLAYTIME = 120
     
     def __init__(self):
         self.hardwareObject = Hardware()
@@ -106,7 +106,7 @@ class Game(object):
     def checkGameFinished(self):
         if self.gameLives == 0:
             self.gameFinished = True
-        if self.startTime - time.time() > self.MAXIMUM_PLAYTIME:
+        if time.time() - self.startTime > self.MAXIMUM_PLAYTIME:
             self.gameFinished = True
             
         if self.gameFinished:

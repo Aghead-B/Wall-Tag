@@ -215,7 +215,7 @@
                 $("#game-finished-success").text("Goed gedaan! Je eindigde met " + jsonData.points + " punten en " + jsonData.lives + " leven(s).");
               }
             } else {
-              setTimeout(function(){countdown(3);}, 2000);
+              setTimeout(function(){if(gameRunning){countdown(3);}}, 2000);
             }
           }
         }
