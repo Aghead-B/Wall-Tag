@@ -1,11 +1,3 @@
-/*
-
-const int irPinnen[] = {6,0,0,0,0,0};
-
-const int statusPinnen[] = {5,0,0,0,0,0};
-
-*/
-
 
 const int irPinnen[] = {A5, A4, A3, A2, A1, A0};
 

@@ -34,8 +34,6 @@ const int echoPin = 10;
 
 long duration;
 int distance;
-//Start == 111
-//Stop == 222
 bool startTrue = false;
 
 void setup() {
